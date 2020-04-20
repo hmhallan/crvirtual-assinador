@@ -79,6 +79,9 @@ public class SmartCardRepository {
 				}
 				smartCard.inicializar(pin);
 			}
+			else {
+				smartCard.inicializar();
+			}
 			
 			this.smartCard = smartCard;
 			
@@ -139,7 +142,7 @@ public class SmartCardRepository {
 		
 	}
 	
-	public void assinar( String alias, String pin, Documento documento ) throws ErroAoAssinarException {
+	public byte [] assinar( String alias, String pin, Documento documento ) throws ErroAoAssinarException {
 		try {
 			
 			X509Certificate signatario = this.consultar(alias);
@@ -172,6 +175,7 @@ public class SmartCardRepository {
 			ContentInfo cms = new ContentInfo(CMSObjectIdentifiers.signedData, sd);
 			byte [] assinatura = cms.getEncoded();
 			
+			return assinatura;
 			
 		} catch (Exception e) {
 			throw new ErroAoAssinarException(e);

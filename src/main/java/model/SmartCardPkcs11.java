@@ -9,7 +9,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Provider;
-
+import java.security.Security;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.Enumeration;
@@ -56,6 +56,8 @@ class SmartCardPkcs11 extends SmartCard {
                 ByteArrayInputStream confStream = new ByteArrayInputStream(pkcs11ConfigBytes);
                 
                 Provider p = new sun.security.pkcs11.SunPKCS11(confStream);
+                
+                Security.addProvider(p);
                 
                 this.keyStore = KeyStore.getInstance(REPOSITORIO_PKCS11, p);
                 

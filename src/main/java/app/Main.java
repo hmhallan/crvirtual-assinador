@@ -2,11 +2,17 @@ package app;
 
 import java.awt.Desktop;
 import java.awt.SystemTray;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import javax.swing.JOptionPane;
+
+import org.apache.commons.io.FileUtils;
 
 import model.Documento;
 //import io.undertow.Undertow;
@@ -38,7 +44,7 @@ public class Main {
 		SmartCardRepository repository = new SmartCardRepository();
 		
 		try {
-			repository.inicializar();
+			repository.inicializar(pin);
 		} catch ( AutenticacaoNecessariaException e) {
 			pin = JOptionPane.showInputDialog("Informe o PIN");
 			try {
@@ -52,16 +58,20 @@ public class Main {
 		
 		if (repository.isInicializado()) {
 			try {
-			List<CertificadoDTO> lista = repository.listarTodos();
-			
-			lista.stream().forEach(System.out::println);
-			
-			CertificadoDTO certificado = lista.get(0);
-			
-			InputStream is = Main.class.getResourceAsStream("/images/key-icon.png");
-			
-			Documento documento = Documento.from(is);
-			repository.assinar(certificado.getAlias(), pin, documento);
+				List<CertificadoDTO> lista = repository.listarTodos();
+				
+				lista.stream().forEach(System.out::println);
+				
+				CertificadoDTO certificado = lista.get(0);
+				
+				InputStream is = Main.class.getResourceAsStream("/images/key-icon.png");
+				
+				Documento documento = Documento.from(is);
+				byte [] assinatura =  repository.assinar(certificado.getAlias(), pin, documento);
+				
+				Path path = Paths.get( System.getProperty("user.dir") + File.separator + "src/main/resources/assinatura.p7s" );
+	            Files.write(path, assinatura);
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
